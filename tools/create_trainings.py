@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
+#from __future__ import unicode_literals
 import sys
 import os
 import re
 import argparse
 import shutil
 import json
+import nltk
 
 from config import Config
 cfg = Config(file('conf/app.cfg'))
 
 sys.path.append('{}/mitielib'.format(cfg.MITIE_PATH))
 
-from mitie import *
+#from mitie import *
 
 def inc(n):
     return n+1
@@ -29,22 +30,27 @@ ids = counter()
 
 def createTraining(text, _id = None):
     _id = _id if _id else str(ids.next())
-    tokens = tokenize_with_offsets(text)
+    #tokens = tokenize_with_offsets(text)
+    #tokens = text.split() 
+    tokens = nltk.wordpunct_tokenize(text.decode("utf8"))
     return { 'id': _id, 'text': text, 'tokens' : tokens, 'tags': [] }
 
 
 def slurp(filePath):
-    with open(filePath) as x: data = x.read()
+    with open(filePath, 'rb') as x: 
+        data = x.read()
     return data
 
 # same as slurp but return Array of lines instead of string
 def slurpA(filePath):
-    with open(filePath) as x: data = x.read().splitlines()
+    with open(filePath) as x: 
+        data = x.read().splitlines()
     return data
 
 def spit(filePath, data, overwrite=False):
     mode= 'w' if overwrite else 'a'
-    with open(filePath, mode) as x: x.write(data)
+    with open(filePath, mode) as x: 
+        x.write(data)
 
 
 if __name__ == "__main__":
@@ -58,13 +64,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     results = []
     for line in args.infile:
-        parts= line.split('\t')
+        parts = line.split('\t')
 
         _id = parts[0]
         body = parts[1]
-        body = re.sub(r'[^\x00-\x7F]',' ', body)
+        #body = re.sub(r'[^\x00-\x7F]',' ', body)
         body = body.replace('[:newline:]',' ').strip()
-        body = body.encode("ascii")
+        #body = body.encode("utf8")
 
         sample = createTraining(body, _id)
 
