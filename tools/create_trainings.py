@@ -30,9 +30,16 @@ ids = counter()
 
 def createTraining(text, _id = None):
     _id = _id if _id else str(ids.next())
-    #tokens = tokenize_with_offsets(text)
-    #tokens = text.split() 
-    tokens = nltk.wordpunct_tokenize(text.decode("utf8"))
+    text_decoded = text.decode("utf8")
+    tokens_wp = nltk.wordpunct_tokenize(text_decoded)
+    span_generator = nltk.tokenize.WordPunctTokenizer().span_tokenize(text_decoded)
+    spans = [span for span in span_generator]
+
+    tokens = []
+
+    for i, token in enumerate(tokens_wp):
+            tokens.append((token, int(spans[i][0])))
+    
     return { 'id': _id, 'text': text, 'tokens' : tokens, 'tags': [] }
 
 
